@@ -1,0 +1,19 @@
+# Fly.io config for Laravel Social. Steps:
+#   1. fly apps create <your-unique-name>   (app names are globally unique across ALL Fly accounts - change `app` below)
+#   2. fly volumes create laravel_social_data --size 1   (persists the default SQLite database)
+#   3. fly secrets set APP_KEY=<php artisan key:generate --show output> APP_URL=https://<your-unique-name>.fly.dev
+#   4. fly deploy --image izdrail/app.laravelsocial.com:latest
+#   5. fly ssh console -C "php artisan migrate --force"   (one time)
+app = "laravel-social"
+primary_region = "ams" # change to your nearest region: fly platform regions
+
+[build]
+  image = "izdrail/app.laravelsocial.com:latest"
+
+[http_service]
+  internal_port = 13001 # the image's supervisord binds Octane to 13001
+  force_https = true
+
+[[mounts]]
+  source = "laravel_social_data"
+  destination = "/var/www/database"
