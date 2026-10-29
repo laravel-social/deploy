@@ -1,0 +1,22 @@
+# Render blueprint - deploys Laravel Social from its public Docker image.
+# Button: https://render.com/deploy?repo=<THIS REPO URL>
+# Requires a paid plan (starter) because persistent disks are not available on free instances.
+services:
+  - type: web
+    name: laravel-social
+    runtime: image
+    image:
+      url: docker.io/izdrail/app.laravelsocial.com:latest
+    plan: starter
+    healthCheckPath: /
+    envVars:
+      - key: PORT
+        value: "13001" # Render routes inbound traffic to PORT (default 10000); the image binds Octane statically to 13001 and EXPOSEs 4 ports, so detection is not relied on
+      - key: APP_KEY
+        sync: false # prompted at deploy: paste `php artisan key:generate --show` output (base64:<32-byte key>). Render's generateValue is not used - it does not guarantee Laravel's required key format.
+      - key: APP_URL
+        sync: false # Render asks for this at deploy time; use https://<your-service>.onrender.com
+    disk:
+      name: laravel-social-data
+      mountPath: /var/www/database # persists the default SQLite database across deploys
+      sizeGB: 1
